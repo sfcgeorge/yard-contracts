@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
     merged with your optional docstring to automatically generate parameter
     documentation with type and description. It does the same for return.
   }
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.homepage      = "https://github.com/sfcgeorge/yard-contracts"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
