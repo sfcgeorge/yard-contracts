@@ -1,6 +1,6 @@
 require 'contracts/builtin_contracts'
 
-module YARDContracts
+module Contracts
   # A namespace for classes related to formatting.
   module Formatters
     # Used to format contracts for the `Expected:` field of error output.
@@ -162,7 +162,7 @@ module YARDContracts
         # which are key value pairs of the Hash and build from that.
         result = {}
         hash.each do |h|
-          result[h[0].jump(:label).last.to_sym] = YARDContracts::Formatters::InspectWrapper.new(type(h[1]))
+          result[h[0].jump(:label).last.to_sym] = Contracts::Formatters::InspectWrapper.new(type(h[1]))
         end
         result
       end
@@ -170,7 +170,7 @@ module YARDContracts
       # Formats Array type.
       def array_type(array)
         # This works because Ast inherits from Array.
-        array.map{ |v| YARDContracts::Formatters::InspectWrapper.new(type(v)) }.inspect
+        array.map{ |v| Contracts::Formatters::InspectWrapper.new(type(v)) }.inspect
       end
     end
 
@@ -217,8 +217,8 @@ module YARDContracts
             named_count = 1
           end
 
-          type = YARDContracts::Formatters::InspectWrapper.new(type)
-          desc = YARDContracts::Formatters::Expected.new(con, false).contract
+          type = Contracts::Formatters::InspectWrapper.new(type)
+          desc = Contracts::Formatters::Expected.new(con, false).contract
           # The pluses are to escape things like curly brackets
           desc = "#{desc}".empty? ? '' : "+#{desc}+"
           s << [param, type, desc]
@@ -230,10 +230,10 @@ module YARDContracts
       def return
         type, type_ast = @result
         con = get_contract_value(type)
-        type = YARDContracts::Formatters::InspectWrapper.new(
+        type = Contracts::Formatters::InspectWrapper.new(
           TypeAST.new(type_ast).type
         )
-        desc = YARDContracts::Formatters::Expected.new(con, false).contract
+        desc = Contracts::Formatters::Expected.new(con, false).contract
         desc = "#{desc}".empty? ? '' : "+#{desc}+"
         [type, desc]
       end

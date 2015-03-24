@@ -8,14 +8,9 @@ require 'contracts/formatters'
 require 'contracts/builtin_contracts'
 require 'yard-contracts/formatters'
 
-# Run the custom handler by supplying the file to yard with the -e flag, e.g.
+# Run the plugin handler by supplying it to yard with the --plugin flag, e.g.
 #
-# bundle exec yardoc -e /Users/sfcgeorge/.rbenv/versions/2.1.5/lib/ruby/gems/2.1.0/gems/contracts-0.7/lib/yard_extensions.rb
-#
-# NOTE: There must be a nicer way to specify that... a YARD plugin seems to be
-# a gem beginning with `yard-` e.g. `yard-contracts` so it looks like we can't
-# have the extension within the main contracts gem. Thoughts?
-#module YARD::Handlers::Ruby::Contracts
+# bundle exec yardoc --plugin contracts
 class ContractHandler < YARD::Handlers::Ruby::Base
   handles method_call(:Contract)
   namespace_only #only match method calls inside a namespace not inside a method
@@ -45,8 +40,8 @@ class ContractHandler < YARD::Handlers::Ruby::Base
     params = def_method_ast.parameters #YARD::Parser::Ruby::ParameterNode
     contracts = statement.parameters #YARD::Parser::Ruby::AstNode
 
-    ret = YARDContracts::Formatters::ParamContracts.new(params, contracts).return
-    params = YARDContracts::Formatters::ParamContracts.new(params, contracts).params
+    ret = Contracts::Formatters::ParamContracts.new(params, contracts).return
+    params = Contracts::Formatters::ParamContracts.new(params, contracts).params
     docstring = YARD::DocstringParser.new.parse(statement.docstring).to_docstring
 
     # Merge params into provided docstring otherwise there can be duplicates
@@ -87,4 +82,3 @@ class ContractHandler < YARD::Handlers::Ruby::Base
     # No `register()` it breaks stuff! Above implicit return value is enough.
   end
 end
-#end
