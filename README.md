@@ -126,7 +126,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 Open issues, and if you can please send pull requests:
 
-1. Fork it ( https://github.com/[my-github-username]/yard-contracts/fork )
+1. Fork it ( https://github.com/sfcgeorge/yard-contracts/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
