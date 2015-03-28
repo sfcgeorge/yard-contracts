@@ -1,7 +1,8 @@
 # yard-contracts
 
-[![Build Status](https://travis-ci.org/sfcgeorge/yard-contracts.svg?branch=master)](https://travis-ci.org/sfcgeorge/yard-contracts)
 [![Gem Version](https://badge.fury.io/rb/yard-contracts.svg)](http://badge.fury.io/rb/yard-contracts)
+[![Inline docs](http://inch-ci.org/github/sfcgeorge/yard-contracts.svg?branch=master)](http://inch-ci.org/github/sfcgeorge/yard-contracts)
+[![Code Climate](https://codeclimate.com/github/sfcgeorge/yard-contracts/badges/gpa.svg)](https://codeclimate.com/github/sfcgeorge/yard-contracts)
 [![Join the chat at https://gitter.im/egonSchiele/contracts.ruby](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/egonSchiele/contracts.ruby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 yard-contracts is a YARD plugin that works with the fantastic Contracts gem to automatically document types and descriptions of parameters in your method signatures, saving time, making your code concise and keeping your documentation consistent.
