@@ -3,12 +3,14 @@ require 'nokogiri_wrapper'
 
 describe YARDContracts do
   before(:context) do
-    @yardir = ENV['TRAVIS_BUILD_DIR'] ?
-      "#{ENV['TRAVIS_BUILD_DIR']}/yard-spec-output" :
-      'yard-spec-output'
+    @base = ENV['TRAVIS_BUILD_DIR'] ?
+      ENV['TRAVIS_BUILD_DIR'] :
+      File.expand_path('../..', File.dirname(__FILE__))
+
+    @yardir = "yard-spec-output"
     Dir.mkdir(@yardir) unless Dir.exist? @yardir
 
-    @yard_return = `bundle exec yardoc --no-highlight --no-save --no-cache --no-stats -o #{@yardir} -e #{File.dirname(__FILE__)}../../lib/yard-contracts.rb spec/yard-test/*.rb`
+    puts @yard_return = `bundle exec yardoc --quiet --no-highlight --no-save --no-cache --no-stats -o "#{@base}/#{@yardir}" -e "#{@base}/lib/yard-contracts.rb" "#{@base}/spec/yard-test/*.rb"`
 
     @standard_class_doc = DocModule.new Nokogiri::HTML(
       File.read("#{@yardir}/StandardClass.html")
