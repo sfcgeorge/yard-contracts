@@ -3,7 +3,9 @@ require 'nokogiri_wrapper'
 
 describe YARDContracts do
   before(:context) do
-    @yardir = 'yard-spec-output'
+    @yardir = ENV['TRAVIS_BUILD_DIR'] ?
+      "#{ENV['TRAVIS_BUILD_DIR']}/yard-spec-output" :
+      'yard-spec-output'
     Dir.mkdir(@yardir) unless Dir.exist? @yardir
 
     @yard_return = `bundle exec yardoc --no-highlight --no-save --no-cache --no-stats -o #{@yardir} -e #{File.dirname(__FILE__)}../../lib/yard-contracts.rb spec/yard-test/*.rb`
