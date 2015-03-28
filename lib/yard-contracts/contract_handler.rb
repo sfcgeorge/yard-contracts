@@ -4,7 +4,7 @@
 # https://github.com/lsegal/yard/issues/825
 require 'yard'
 
-require 'contracts/formatters'
+#require 'contracts/formatters'
 require 'contracts/builtin_contracts'
 require 'yard-contracts/formatters'
 
