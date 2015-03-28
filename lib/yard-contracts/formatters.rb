@@ -82,6 +82,7 @@ module Contracts
 
       def has_useful_to_s?
         # Useless to_s value or no custom to_s behavious defined
+        # Ruby < 2.0 makes inspect call to_s so this won't work
         @value.to_s != "" && @value.to_s != @value.inspect
       end
     end
