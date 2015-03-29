@@ -8,12 +8,13 @@ require 'yard'
 require 'contracts/builtin_contracts'
 require 'yard-contracts/formatters'
 
-# Run the plugin handler by supplying it to yard with the --plugin flag, e.g.
+# Run the plugin handler by supplying it to yard with the --plugin flag
 #
-# bundle exec yardoc --plugin contracts
+# @example
+#   bundle exec yardoc --plugin contracts
 class ContractHandler < YARD::Handlers::Ruby::Base
   handles method_call(:Contract)
-  namespace_only #only match method calls inside a namespace not inside a method
+  namespace_only # only match calls inside a namespace not inside a method
 
   def process
     # statement is a YARD attribute, subclassing YARD::Parser::Ruby::AstNode
@@ -27,7 +28,7 @@ class ContractHandler < YARD::Handlers::Ruby::Base
     # Note: this won't document dynamicly defined methods.
     parent = statement.parent
     contract_last_line = statement.line_range.last
-    #YARD::Parser::Ruby::MethodDefinitionNode
+    # YARD::Parser::Ruby::MethodDefinitionNode
     def_method_ast = parent.traverse do |node|
       # Find the first def statement that comes after the contract we're on
       break node if node.line > contract_last_line && node.def?
@@ -37,48 +38,74 @@ class ContractHandler < YARD::Handlers::Ruby::Base
     ## TODO: What about module methods? Probably broken.
     scope = def_method_ast.source.match(/ self\./) ? :class : :instance
     name = def_method_ast.method_name true
-    params = def_method_ast.parameters #YARD::Parser::Ruby::ParameterNode
-    contracts = statement.parameters #YARD::Parser::Ruby::AstNode
+    params = def_method_ast.parameters # YARD::Parser::Ruby::ParameterNode
+    contracts = statement.parameters # YARD::Parser::Ruby::AstNode
 
     ret = Contracts::Formatters::ParamContracts.new(params, contracts).return
     params = Contracts::Formatters::ParamContracts.new(params, contracts).params
-    docstring = YARD::DocstringParser.new.parse(statement.docstring).to_docstring
+    doc = YARD::DocstringParser.new.parse(statement.docstring).to_docstring
 
-    # Merge params into provided docstring otherwise there can be duplicates
-    docstring.tags(:param).each do |tag|
-      param = params.find{ |t| t[0].to_s == tag.name.to_s }
-      if param
-        params.delete(param)
-        tag.types ||= []
-        tag.types << param[1].inspect
-        tag.text = "#{param[2].empty? ? '' : "#{param[2]}. "}#{tag.text}"
-      end
-    end
-    # If the docstring didn't contain all of the params already add the rest
-    params.each do |param|
-      docstring.add_tag(
-        YARD::Tags::Tag.new(:param, param[2].to_s, param[1].inspect, param[0])
-      )
-    end
-
-    # Merge return into provided docstring otherwise there can be a duplicate
-    # NOTE: Think about what to do with multiple returns
-    if (tag = docstring.tag(:return))
-      tag.types ||= []
-      tag.types << ret[0].inspect
-      tag.text = "#{ret[1].empty? ? '' : "#{ret[1]}. "}#{tag.text}"
-    else
-      # If the docstring didn't contain a return already add it
-      docstring.add_tag(
-        YARD::Tags::Tag.new(:return, ret[1].to_s, ret[0].inspect)
-      )
-    end
+    process_params(doc, params)
+    process_return(doc, ret)
 
     # YARD hasn't got to the def method yet, so we create a stub of it with
     # our docstring, when YARD gets to it properly it will fill in the rest.
     YARD::CodeObjects::MethodObject.new(namespace, name, scope) do |o|
-      o.docstring = docstring
+      o.docstring = doc
     end
     # No `register()` it breaks stuff! Above implicit return value is enough.
+  end
+
+  def process_params(doc, params)
+    merge_params(doc, params)
+    new_params(doc, params)
+  end
+
+  def merge_params(doc, params)
+    # Merge params into provided docstring otherwise there can be duplicates
+    doc.tags(:param).each do |tag|
+      next unless (param = params.find { |t| t[0].to_s == tag.name.to_s })
+      params.delete(param)
+      set_tag(tag, param[1], param[2])
+    end
+  end
+
+  def new_params(doc, params)
+    # If the docstring didn't contain all of the params already add the rest
+    params.each do |param|
+      doc.add_tag(
+        YARD::Tags::Tag.new(:param, param[2].to_s, param[1].inspect, param[0])
+      )
+    end
+  end
+
+  def process_return(doc, ret)
+    if (tag = doc.tag :return)
+      # Merge return into provided docstring otherwise there can be a duplicate
+      merge_return(tag, ret)
+    else
+      # If the docstring didn't contain a return already add it
+      new_return(doc, ret)
+    end
+  end
+
+  def merge_return(tag, ret)
+    set_tag(tag, ret[0], ret[1])
+  end
+
+  def new_return(doc, ret)
+    doc.add_tag(
+      YARD::Tags::Tag.new(:return, ret[1].to_s, ret[0].inspect)
+    )
+  end
+
+  def set_tag(tag, type, to_s)
+    tag.types ||= []
+    tag.types << type.inspect
+    tag.text = tag_text(to_s, tag.text)
+  end
+
+  def tag_text(to_s, text)
+    "#{to_s.empty? ? '' : "#{to_s}. "}#{text}"
   end
 end

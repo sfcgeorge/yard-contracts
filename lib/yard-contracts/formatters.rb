@@ -5,7 +5,7 @@ module Contracts
   module Formatters
     # Used to format contracts for the `Expected:` field of error output.
     class Expected
-      def initialize(contract, full=true)
+      def initialize(contract, full = true)
         @contract, @full = contract, full
       end
 
@@ -23,22 +23,22 @@ module Contracts
       # Formats Hash contracts.
       def hash_contract(hash)
         @full = true
-        hash.inject({}) { |repr, (k, v)|
+        hash.inject({}) do |repr, (k, v)|
           repr.merge(k => InspectWrapper.new(contract(v), @full))
-        }.inspect
+        end.inspect
       end
 
       # Formats Array contracts.
       def array_contract(array)
         @full = true
-        array.map{ |v| InspectWrapper.new(contract(v), @full) }.inspect
+        array.map { |v| InspectWrapper.new(contract(v), @full) }.inspect
       end
     end
 
     # A wrapper class to produce correct inspect behaviour for different
     # contract values - constants, Class contracts, instance contracts etc.
     class InspectWrapper
-      def initialize(value, full=true)
+      def initialize(value, full = true)
         @value, @full = value, full
       end
 
@@ -51,7 +51,7 @@ module Contracts
         return '' unless full?
         return @value.inspect if empty_val?
         return @value.to_s if plain?
-        return delim(@value.to_s) if has_useful_to_s?
+        return delim(@value.to_s) if useful_to_s?
         @value.inspect.gsub(/^Contracts::/, '')
       end
 
@@ -65,14 +65,15 @@ module Contracts
       end
 
       private
+
       def empty_val?
-        @value.nil? || @value == ""
+        @value.nil? || @value == ''
       end
 
       def full?
         @full ||
-        @value.is_a?(Hash) || @value.is_a?(Array) ||
-        (!plain? && has_useful_to_s?)
+          @value.is_a?(Hash) || @value.is_a?(Array) ||
+          (!plain? && useful_to_s?)
       end
 
       def plain?
@@ -80,10 +81,10 @@ module Contracts
         !@value.is_a?(CallableClass) && @value.class != Class
       end
 
-      def has_useful_to_s?
+      def useful_to_s?
         # Useless to_s value or no custom to_s behavious defined
         # Ruby < 2.0 makes inspect call to_s so this won't work
-        @value.to_s != "" && @value.to_s != @value.inspect
+        @value.to_s != '' && @value.to_s != @value.inspect
       end
     end
 
@@ -95,7 +96,7 @@ module Contracts
       def to_a
         types = []
         @types.each_with_index do |type, i|
-          if i == @types.length-1
+          if i == @types.length - 1
             # Get the param out of the `param => result` part
             types << [type.first.first.source, type.first.first]
           else
@@ -118,8 +119,8 @@ module Contracts
 
       def to_a
         params = []
-        @params.each_with_index do |param, i|
-          #YARD::Parser::Ruby::AstNode
+        @params.each do |param|
+          # YARD::Parser::Ruby::AstNode
           next if param.nil?
           if param.type == :list
             param.each do |p|
@@ -134,6 +135,7 @@ module Contracts
       end
 
       private
+
       def build_param_element(param)
         type = param.type
         ident = param.jump(:ident, :label).last.to_sym
@@ -163,7 +165,8 @@ module Contracts
         # which are key value pairs of the Hash and build from that.
         result = {}
         hash.each do |h|
-          result[h[0].jump(:label).last.to_sym] = Contracts::Formatters::InspectWrapper.new(type(h[1]))
+          result[h[0].jump(:label).last.to_sym] =
+            Contracts::Formatters::InspectWrapper.new(type(h[1]))
         end
         result
       end
@@ -171,7 +174,9 @@ module Contracts
       # Formats Array type.
       def array_type(array)
         # This works because Ast inherits from Array.
-        array.map{ |v| Contracts::Formatters::InspectWrapper.new(type(v)) }.inspect
+        array.map do |v|
+          Contracts::Formatters::InspectWrapper.new(type(v))
+        end.inspect
       end
     end
 
@@ -190,7 +195,7 @@ module Contracts
           param_type, param = param
 
           on_named = param_type == :named_arg ||
-                    (named_count > 0 && param_type == :ident)
+                     (named_count > 0 && param_type == :ident)
           i -= named_count if on_named
 
           type, type_ast = @types[i]
@@ -240,18 +245,15 @@ module Contracts
       end
 
       private
+
       # The contract starts as a string, but we need to get it's real value
       # so that we can call to_s on it.
       def get_contract_value(type)
         con = type
         begin
           con = Contracts.const_get(type)
-        rescue Exception #NameError
-          begin
-            con = eval(type)
-          rescue Exception
-            con
-          end
+        rescue StandardError # NameError
+          con = eval(type) rescue StandardError
         end
         con
       end
