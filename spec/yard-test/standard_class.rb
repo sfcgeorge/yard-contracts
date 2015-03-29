@@ -25,4 +25,10 @@ class StandardClass
   Contract Or[Symbol, String] => Or[TrueClass, FalseClass]
   def fancy_desc(stringy)
   end
+
+  # Custom contracts will be documented (including `to_s`) if they are passed
+  # to YARD with -e flag and defined under global or Contracts namespace.
+  Contract Stringy => Plural
+  def custom_contract(word)
+  end
 end

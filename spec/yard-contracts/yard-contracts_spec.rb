@@ -3,14 +3,17 @@ require 'nokogiri_wrapper'
 
 describe YARDContracts do
   before(:context) do
-    @base = ENV['TRAVIS_BUILD_DIR'] ?
-      ENV['TRAVIS_BUILD_DIR'] :
-      File.expand_path('../..', File.dirname(__FILE__))
+    @base =
+      if ENV['TRAVIS_BUILD_DIR']
+        ENV['TRAVIS_BUILD_DIR']
+      else
+        File.expand_path('../..', File.dirname(__FILE__))
+      end
 
-    @yardir = "yard-spec-output"
+    @yardir = 'yard-spec-output'
     Dir.mkdir(@yardir) unless Dir.exist? @yardir
 
-    puts @yard_return = `bundle exec yardoc --quiet --no-highlight --no-save --no-cache --no-stats -o "#{@base}/#{@yardir}" -e "#{@base}/lib/yard-contracts.rb" "#{@base}/spec/yard-test/*.rb"`
+    puts @yard_return = `bundle exec yardoc --quiet --no-highlight --no-save --no-cache --no-stats -o "#{@base}/#{@yardir}" -e "#{@base}/lib/yard-contracts.rb" -e "#{@base}/spec/yard-test/custom_contracts.rb" "#{@base}/spec/yard-test/*.rb"`
 
     @standard_class_doc = DocModule.new Nokogiri::HTML(
       File.read("#{@yardir}/StandardClass.html")
@@ -20,7 +23,6 @@ describe YARDContracts do
   after(:context) do
     FileUtils.remove_entry(@yardir)
   end
-
 
   it 'has a version number' do
     expect(YARDContracts::VERSION).not_to be nil
@@ -50,7 +52,7 @@ describe YARDContracts do
     ).to match(/\(String\)/)
   end
 
-  it "doesnt include useless/duplicate to_s description" do
+  it 'doesnt include useless/duplicate to_s description' do
     expect(
       @standard_class_doc.find_method(:simple).param(:one).text
     ).to_not match(/\(Num\).*Num/)
@@ -87,5 +89,17 @@ describe YARDContracts do
     expect(ret).to match(/\(Or.+\)/)
     expect(ret).to match(/TrueClass or FalseClass/)
     expect(ret).to match(/true for String/)
+  end
+
+  it 'works for custom contracts with to_s in Contracts namespace' do
+    ret = @standard_class_doc.find_method(:custom_contract).param(:word).text
+    expect(ret).to match(/\(Stringy\)/)
+    expect(ret).to match(/A String or Symbol/)
+  end
+
+  it 'works for custom contracts with to_s in global namespace' do
+    ret = @standard_class_doc.find_method(:custom_contract).return.text
+    expect(ret).to match(/\(Plural\)/)
+    expect(ret).to match(/A plural String/)
   end
 end
