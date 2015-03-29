@@ -6,7 +6,7 @@
 [![Inline docs](http://inch-ci.org/github/sfcgeorge/yard-contracts.svg?branch=master)](http://inch-ci.org/github/sfcgeorge/yard-contracts)
 [![Join the chat at https://gitter.im/egonSchiele/contracts.ruby](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/egonSchiele/contracts.ruby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-yard-contracts is a YARD plugin that works with the fantastic Contracts gem to automatically document types and descriptions of parameters in your method signatures, saving time, making your code concise and keeping your documentation consistent.
+yard-contracts is a YARD plugin that works with the fantastic [Contracts](https://github.com/egonSchiele/contracts.ruby) gem to automatically document types and descriptions of parameters in your method signatures, saving time, making your code concise and keeping your documentation consistent.
 
 Have you ever got fed up of coding validations, writing error messages and then documenting those things? All this duplication and boilerplate code has always bugged me. Contracts solves the validations and error messages part already, turning many lines of repetitive code into 1 terse readable one. This extension now solves the documentation part making documentation automatically say the same as your validations.
 
