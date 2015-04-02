@@ -6,6 +6,7 @@ class StandardClass
   # naming things and cache invalidation
   Contract Num => String
   def simple(one)
+    self.class_simple(true)
   end
 
   Contract Or[String, Symbol] => Any
@@ -30,5 +31,15 @@ class StandardClass
   # to YARD with -e flag and defined under global or Contracts namespace.
   Contract Stringy => Plural
   def custom_contract(word)
+  end
+
+  # Class method
+  Contract Bool => Any
+  def self.class_simple(bool)
+  end
+
+  # Class method with odd formatting
+  Contract Bool => Any
+  def       self.class_format(bool)
   end
 end

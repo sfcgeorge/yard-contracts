@@ -4,7 +4,7 @@
 # https://github.com/lsegal/yard/issues/825
 require 'yard'
 
-#require 'contracts/formatters'
+# require 'contracts/formatters'
 require 'contracts/builtin_contracts'
 require 'yard-contracts/formatters'
 
@@ -36,7 +36,7 @@ class ContractHandler < YARD::Handlers::Ruby::Base
 
     ## Hacky way to test for class methods
     ## TODO: What about module methods? Probably broken.
-    scope = def_method_ast.source.match(/ self\./) ? :class : :instance
+    scope = def_method_ast.source.match(/def +self\./) ? :class : :instance
     name = def_method_ast.method_name true
     params = def_method_ast.parameters # YARD::Parser::Ruby::ParameterNode
     contracts = statement.parameters # YARD::Parser::Ruby::AstNode

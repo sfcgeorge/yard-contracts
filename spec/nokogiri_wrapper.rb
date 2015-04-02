@@ -8,7 +8,7 @@ class DocModule < DocDoc
   def find_method(instance=:instance, name)
     DocMethod.new(
       @doc.at_css("##{instance}_method_details")
-          .at_css("##{name}-instance_method")
+          .at_css("##{name}-#{instance}_method")
           .parent
     )
   end

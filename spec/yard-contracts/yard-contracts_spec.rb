@@ -102,4 +102,16 @@ describe YARDContracts do
     expect(ret).to match(/\(Plural\)/)
     expect(ret).to match(/A plural String/)
   end
+
+  it 'documents class methods from def statement' do
+    expect(
+      @standard_class_doc.find_method(:class, :class_simple).param(:bool).text
+    ).to match(/\(Bool\)/)
+  end
+
+  it 'documents class methods from def statement with odd formatting' do
+    expect(
+      @standard_class_doc.find_method(:class, :class_format).param(:bool).text
+    ).to match(/\(Bool\)/)
+  end
 end
