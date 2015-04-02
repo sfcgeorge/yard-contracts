@@ -256,8 +256,11 @@ module Contracts
         con = type
         begin
           con = Contracts.const_get(type)
-        rescue StandardError # NameError
-          con = eval(type) rescue StandardError
+        rescue Exception
+          begin
+            con = eval(type)
+          rescue Exception
+          end
         end
         con
       end

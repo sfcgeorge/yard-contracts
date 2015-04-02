@@ -42,4 +42,14 @@ class StandardClass
   Contract Bool => Any
   def       self.class_format(bool)
   end
+
+  # Contract with nested square brackets, breaks Ripper
+  Contract ArrayOf[ArrayOf[Num]] => Any
+  def dodgy_brackets(a)
+  end
+
+  # Contract that gets around Ripper's broken nested square brackets
+  Contract ArrayOf.new(ArrayOf[Num]) => Any
+  def hacky_brackets(a)
+  end
 end
